@@ -25,15 +25,12 @@ module KnifeFlip
         exit 1
       end
 
-      puts "Looking for an fqdn of #{@node_name}"
+      puts "Looking for a node named #{@node_name}"
 
-      searcher = Chef::Search::Query.new
-      result = searcher.search(:node, "fqdn:#{@node_name}")
-
-      knife_search = Chef::Knife::Search.new
-      node = result.first.first
-      if node.nil?
-        puts "Could not find a node with the fqdn of #{@node_name}"
+      begin
+        node = Chef::Node::load(@node_name)
+      rescue => node
+        puts "Could not find a node named #{@node_name}"
         exit 1
       end
 
@@ -54,7 +51,7 @@ module KnifeFlip
       node.save
 
       knife_search = Chef::Knife::Search.new
-      knife_search.name_args = ['node', "fqdn:#{@node_name}"]
+      knife_search.name_args = ['node', "name:#{@node_name}"]
       knife_search.run
 
     end
